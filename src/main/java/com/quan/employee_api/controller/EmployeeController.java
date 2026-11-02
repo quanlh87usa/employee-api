@@ -1,10 +1,8 @@
-package com.quan.employee_api;
+package com.quan.employee_api.controller;
 
 import java.util.List;
-import java.util.Optional;
 import jakarta.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +13,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.quan.employee_api.entity.Employee;
+import com.quan.employee_api.service.EmployeeService;
+
 /**
  * REST controller responsible for handling employee-related API requests.
  */
@@ -22,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController 
 public class EmployeeController {
 
-    private final EmployeeRepository employeeRepository;
-    
-    public EmployeeController(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    private final EmployeeService employeeService;
+
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
     /**
@@ -35,7 +36,7 @@ public class EmployeeController {
      */
     @GetMapping("/employees")
     public List<Employee> viewEmployees() {
-        return employeeRepository.findAll();
+        return employeeService.viewEmployees();
     }
 
 
@@ -44,12 +45,10 @@ public class EmployeeController {
      *
      * @param id the ID of the employee to retrieve
      * @return the employee matching the specified ID
-     * @throws EmployeeNotFoundException if the employee is not found
      */
     @GetMapping("/employees/{id}")
-    public Employee getEmployee(@PathVariable Long id) {
-        return employeeRepository.findById(id)
-        .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+    public ResponseEntity<Employee> getEmployee(@PathVariable Long id) {
+        return employeeService.getEmployee(id);
 
     }
     
@@ -61,8 +60,7 @@ public class EmployeeController {
      */
     @PostMapping("/employees")
     public ResponseEntity<Employee> createEmployee(@Valid @RequestBody Employee employee) {
-        Employee savedEmployee = employeeRepository.save(employee);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedEmployee);
+        return employeeService.createEmployee(employee);
     }
 
     /**
@@ -71,15 +69,9 @@ public class EmployeeController {
      * @param id the ID of the employee to delete
      * @return a response with HTTP 204 if deletion succeeds, or HTTP 404 if the employee is not found
      */
-    @DeleteMapping ("/employees/{id}")
+    @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
-        if(employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        employeeRepository.deleteById(id);
-
-        return ResponseEntity.noContent().build();
+        return employeeService.deleteEmployee(id);
     }
 
     /**
@@ -89,17 +81,8 @@ public class EmployeeController {
      * @param employee the updated employee data
      * @return the updated employee
      */
-    @PutMapping  ("/employees/{id}")
+    @PutMapping("/employees/{id}")
     public ResponseEntity<Employee> updateEmployee(@Valid @RequestBody Employee employee, @PathVariable Long id) {
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
-        if(employeeOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Employee existingEmployee = employeeOptional.get();
-        existingEmployee.setName(employee.getName());
-        existingEmployee.setSalary(employee.getSalary());
-        existingEmployee = employeeRepository.save(existingEmployee);
-
-        return ResponseEntity.ok(existingEmployee);
+        return employeeService.updateEmployee(employee, id);
     }
 }

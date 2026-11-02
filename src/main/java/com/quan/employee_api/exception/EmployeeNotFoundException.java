@@ -1,4 +1,4 @@
-package com.quan.employee_api;
+package com.quan.employee_api.exception;
 
 public class EmployeeNotFoundException extends RuntimeException {
     
