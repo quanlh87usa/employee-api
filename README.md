@@ -23,6 +23,53 @@ A RESTful backend application for managing employee information, built with Java
 - Centralized exception handling
 - HTTP status code handling
 
+## Project Structure
+
+employee-api/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── quan/
+│   │   │           └── employee_api/
+│   │   │               │
+│   │   │               ├── controller/
+│   │   │               │   └── EmployeeController.java
+│   │   │               │
+│   │   │               ├── entity/
+│   │   │               │   └── Employee.java
+│   │   │               │
+│   │   │               ├── exception/
+│   │   │               │   ├── ApiErrorResponse.java
+│   │   │               │   ├── EmployeeNotFoundException.java
+│   │   │               │   └── GlobalExceptionHandler.java
+│   │   │               │
+│   │   │               ├── repository/
+│   │   │               │   └── EmployeeRepository.java
+│   │   │               │
+│   │   │               ├── service/
+│   │   │               │   └── EmployeeService.java
+│   │   │               │
+│   │   │               └── EmployeeApiApplication.java
+│   │   │
+│   │   └── resources/
+│   │       └── application.properties
+│   │
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── quan/
+│                   └── employee_api/
+│                       └── EmployeeApiApplicationTests.java
+│
+├── docs/
+│   └── testing/
+│       └── test-cases.md
+│
+├── pom.xml
+└── README.md
+
 ## Requirements
 
 - Java JDK
