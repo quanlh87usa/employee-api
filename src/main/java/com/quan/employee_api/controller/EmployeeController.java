@@ -1,8 +1,7 @@
 package com.quan.employee_api.controller;
 
-import java.util.List;
 import jakarta.validation.Valid;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,11 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.quan.employee_api.dto.EmployeeRequestDTO;
 import com.quan.employee_api.dto.EmployeeResponseDTO;
-import com.quan.employee_api.exception.EmployeeNotFoundException;
 import com.quan.employee_api.service.EmployeeService;
 
 /**
@@ -39,8 +38,13 @@ public class EmployeeController {
      * @return a list of EmployeeResponseDTO objects
      */
     @GetMapping("/employees")
-    public List<EmployeeResponseDTO> viewEmployees() {
-        return employeeService.viewEmployees();
+    public Page<EmployeeResponseDTO> viewEmployees(@RequestParam(defaultValue = "0") int page, 
+                                                    @RequestParam(defaultValue = "5") int size,
+                                                    @RequestParam(defaultValue = "id") String sortBy,
+                                                    @RequestParam(defaultValue = "ASC") String direction,
+                                                    @RequestParam(defaultValue = "") String name,
+                                                    @RequestParam(defaultValue = "") String department) {
+        return employeeService.viewEmployees(page, size, sortBy, direction, name, department);
     }
 
     /**

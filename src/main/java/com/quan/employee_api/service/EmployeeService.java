@@ -1,8 +1,5 @@
 package com.quan.employee_api.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.quan.employee_api.dto.EmployeeRequestDTO;
 import com.quan.employee_api.dto.EmployeeResponseDTO;
 import com.quan.employee_api.entity.Employee;
@@ -10,6 +7,13 @@ import com.quan.employee_api.exception.EmployeeNotFoundException;
 import com.quan.employee_api.mapper.EmployeeMapper;
 import com.quan.employee_api.repository.EmployeeRepository;
 
+import java.util.Locale;
+
+import org.springframework.data.core.PropertyReferenceException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,8 +34,51 @@ public class EmployeeService {
      *
      * @return a list of EmployeeResponseDTO objects
      */
-    public List<EmployeeResponseDTO> viewEmployees() {
-        return employeeRepository.findAll().stream().map(EmployeeMapper::toResponseDTO).collect(Collectors.toList());
+    public Page<EmployeeResponseDTO> viewEmployees(int page, int size, 
+                                                    String sortBy, String direction,
+                                                    String name, String department) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page index cannot be negative.");
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("Page size must be greater than zero.");
+        }
+
+        // check validate for sortBy requestParam
+        if(!sortBy.equalsIgnoreCase("id") &&
+            !sortBy.equalsIgnoreCase("name") &&
+            !sortBy.equalsIgnoreCase("department") &&
+            !sortBy.equalsIgnoreCase("salary")) {
+            throw new IllegalArgumentException("sortBy is invalid");
+        }
+        Sort sort = Sort.by(sortBy);
+        
+        // check validate for direction requestParam
+        direction = direction.toUpperCase(Locale.ROOT);
+        if(direction.equals("DESC")) {
+            sort = sort.descending();
+        }
+        if(!direction.equals("DESC") && !direction.equals("ASC")) {
+            throw new IllegalArgumentException("direction is invalid");
+        }
+
+        // config pageable
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+
+        // excute search action
+        Page<Employee> employees = null;
+        if(name.isBlank() && department.isBlank()) {
+            employees = employeeRepository.findAll(pageable);
+        } else if(!name.isBlank() && department.isBlank()) {
+            employees = employeeRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else if(!department.isBlank() && name.isBlank()) {
+            employees = employeeRepository.findByDepartmentIgnoreCase(department, pageable);
+        } else {
+            employees = employeeRepository.findByNameContainingIgnoreCaseAndDepartmentIgnoreCase(name, department, pageable);
+        }
+        
+        return employees.map(EmployeeMapper::toResponseDTO);
     }
 
     /**

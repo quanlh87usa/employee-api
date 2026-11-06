@@ -52,6 +52,13 @@ public class GlobalExceptionHandler {
         ApiErrorResponse body = new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidArgument(IllegalArgumentException ex) {
+
+        ApiErrorResponse body = new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null);
+        return ResponseEntity.badRequest().body(body);
+    }
     
     /**
      * Handles unexpected exceptions that are not covered by specific handlers.
