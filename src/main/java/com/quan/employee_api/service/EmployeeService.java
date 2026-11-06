@@ -8,8 +8,6 @@ import com.quan.employee_api.mapper.EmployeeMapper;
 import com.quan.employee_api.repository.EmployeeRepository;
 
 import java.util.Locale;
-
-import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
